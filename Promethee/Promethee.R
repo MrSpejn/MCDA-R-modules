@@ -41,22 +41,15 @@ calculateCriteriaPositiveFlows <- function(preferenceCube) {
 }
 
 calculateCriteriaNegativeFlows <- function(preferenceCube) {
-     alternativesLength <- dim(preferenceCube)[1]
+    alternativesLength <- dim(preferenceCube)[1]
 
     apply(preferenceCube, c(2, 3), function(othersAgainstAlternative) {
         sum(othersAgainstAlternative)/(alternativesLength - 1)
     })
 }
 
-calculateCriteriaNetFlows <- function(preferenceCube) {
-    calculateCriteriaPositiveFlows(preferenceCube) - calculateCriteriaNegativeFlows(preferenceCube)
-}
 
 calculateAggregatedPreference <- function(preferenceCube, criteriaWeights) {
-    
-    alternativesLength <- dim(preferenceCube)[1]
-    criteriaLength <- dim(preferenceCube)[3]
-
     criteriaWeightsSum <- sum(criteriaWeights)
     
     apply(preferenceCube, c(1, 2), function(criteria) {
@@ -80,12 +73,19 @@ mapNegativeOutrankingFlow <- function(aggregatedPreferenceTable) {
     })
 }
 
+calculateCriteriaNetFlows <- function(preferenceCube) {
+    calculateCriteriaPositiveFlows(preferenceCube) - calculateCriteriaNegativeFlows(preferenceCube)
+}
 
 PrometheeI <- function(
     performanceTable,
     criteriaPreferenceFunction,
     criteriaWeights
 ) {
+    if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
+        stop("wrong performanceTable, should be a matrix or a data frame")
+
+    
     numberOfAlternatives <- dim(performanceTable)[1]
     preferenceCube <- calculatePreference(performanceTable, criteriaPreferenceFunction)
     aggregatedPreferenceTable <- calculateAggregatedPreference(preferenceCube, criteriaWeights)
@@ -133,6 +133,9 @@ PrometheeII <- function(
     criteriaPreferenceFunction,
     criteriaWeights
 ) {
+    if (!((is.matrix(performanceTable) || (is.data.frame(performanceTable))))) 
+        stop("wrong performanceTable, should be a matrix or a data frame")
+    
     numberOfAlternatives <- dim(performanceTable)[1]
     preferenceCube <- calculatePreference(performanceTable, criteriaPreferenceFunction)
     aggregatedPreferenceTable <- calculateAggregatedPreference(preferenceCube, criteriaWeights)
