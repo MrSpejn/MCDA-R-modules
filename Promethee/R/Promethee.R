@@ -167,7 +167,7 @@ get_criteria_difference <- function (a_criterion_value, b_criterion_value, crite
 }
 
 criteriaFunctions = list()
-criteriaFunctions[["Usual"]] = function (criterion_gain=TRUE) { 
+criteriaFunctions[["Basic"]] = function (criterion_gain=TRUE) { 
     function(a_criterion_value, b_criterion_value) {
         criteria_difference <- get_criteria_difference(a_criterion_value, b_criterion_value, criterion_gain)
         
@@ -192,7 +192,7 @@ criteriaFunctions[["V-shape"]] = function (p, criterion_gain=TRUE) {
         return(criteria_difference/p)
     }
 }
-criteriaFunctions[["V-shape-with-incriteria"]] = function (q, p, criterion_gain=TRUE) { 
+criteriaFunctions[["V-shape-with-indifference"]] = function (q, p, criterion_gain=TRUE) { 
     function(a_criterion_value, b_criterion_value) {
         criteria_difference <- get_criteria_difference(a_criterion_value, b_criterion_value, criterion_gain)
         
