@@ -1,6 +1,3 @@
-
-
-
 calculatePreference <- function(
     performanceTable,
     criteriaPreferenceFunctions
@@ -88,7 +85,9 @@ PrometheeI <- function(
     
     numberOfAlternatives <- dim(performanceTable)[1]
     preferenceCube <- calculatePreference(performanceTable, criteriaPreferenceFunction)
+    print(preferenceCube)
     aggregatedPreferenceTable <- calculateAggregatedPreference(preferenceCube, criteriaWeights)
+    print(aggregatedPreferenceTable)
     positiveFlow <- mapPositiveOutrankingFlow(aggregatedPreferenceTable)
     negativeFlow <- mapNegativeOutrankingFlow(aggregatedPreferenceTable)
 
@@ -193,7 +192,7 @@ criteriaFunctions[["V-shape"]] = function (p, criterion_gain=TRUE) {
         return(criteria_difference/p)
     }
 }
-criteriaFunctions[["V-shape-with-incriteria_difference"]] = function (q, p, criterion_gain=TRUE) { 
+criteriaFunctions[["V-shape-with-incriteria"]] = function (q, p, criterion_gain=TRUE) { 
     function(a_criterion_value, b_criterion_value) {
         criteria_difference <- get_criteria_difference(a_criterion_value, b_criterion_value, criterion_gain)
         
