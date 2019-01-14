@@ -54,7 +54,7 @@ calculateAggregatedPreference <- function(preferenceCube, criteriaWeights) {
     })
 }
 
-mapPositiveOutrankingFlow <- function(aggregatedPreferenceTable) {
+calculatePositiveOutrankingFlow <- function(aggregatedPreferenceTable) {
     numberOfAlternatives <- dim(aggregatedPreferenceTable)[1]
 
     apply(aggregatedPreferenceTable, 1, function(row) {
@@ -62,7 +62,7 @@ mapPositiveOutrankingFlow <- function(aggregatedPreferenceTable) {
     })
 }
 
-mapNegativeOutrankingFlow <- function(aggregatedPreferenceTable) {
+calculateNegativeOutrankingFlow <- function(aggregatedPreferenceTable) {
     numberOfAlternatives <- dim(aggregatedPreferenceTable)[1]
     
     apply(aggregatedPreferenceTable, 2, function(row) {
@@ -72,6 +72,60 @@ mapNegativeOutrankingFlow <- function(aggregatedPreferenceTable) {
 
 calculateCriteriaNetFlows <- function(preferenceCube) {
     calculateCriteriaPositiveFlows(preferenceCube) - calculateCriteriaNegativeFlows(preferenceCube)
+}
+
+getPartialRankingRelation <- function(positiveFlow, negativeFlow, comparedPositiveFlow, comparedNegativeFlow) {
+    if (positiveFlow > comparedPositiveFlow) {
+        if (negativeFlow <= comparedNegativeFlow) {
+            'P'
+        } else {
+            'R'
+        }
+    } else if (negativeFlow < comparedNegativeFlow) {
+        if (positiveFlow >= comparedPositiveFlow) {
+            'P'
+        } else {
+            'R'
+        }
+    } else if (positiveFlow == comparedPositiveFlow && negativeFlow == comparedNegativeFlow) {
+        'I'
+    } else {
+        '-'
+    }
+}
+
+getFullRankingRelation <- function (netFlow, comparedNetFlow) {
+    if (netFlow > comparedNetFlow) {
+        'P'
+    } else if (netFlow == comparedNetFlow) {
+        'I'
+    } else {
+        '-'
+    }
+}
+
+createRanking <- function(flow, negativeFlow=c(), full=TRUE) {
+    n = length(flow)
+    ranking <- array('-', dim=c(n, n))
+
+    for (i in seq(n)) {
+        for (k in seq(n)) {
+            if (full) {
+                ranking[i, k] = getFullRankingRelation(
+                    flow[i],
+                    flow[k]
+                )
+            } else {
+                ranking[i, k] = getPartialRankingRelation(
+                    flow[i],
+                    negativeFlow[i],
+                    flow[k],
+                    negativeFlow[k]
+                )
+            }
+        }
+    }
+    ranking
 }
 
 PrometheeI <- function(
@@ -85,46 +139,11 @@ PrometheeI <- function(
     
     numberOfAlternatives <- dim(performanceTable)[1]
     preferenceCube <- calculatePreference(performanceTable, criteriaPreferenceFunction)
-    print(preferenceCube)
     aggregatedPreferenceTable <- calculateAggregatedPreference(preferenceCube, criteriaWeights)
-    print(aggregatedPreferenceTable)
-    positiveFlow <- mapPositiveOutrankingFlow(aggregatedPreferenceTable)
-    negativeFlow <- mapNegativeOutrankingFlow(aggregatedPreferenceTable)
+    positiveFlow <- calculatePositiveOutrankingFlow(aggregatedPreferenceTable)
+    negativeFlow <- calculateNegativeOutrankingFlow(aggregatedPreferenceTable)
 
-    
-    flow <- cbind(positiveFlow, negativeFlow)
-    
-    ranking <- array('_', dim=c(numberOfAlternatives, numberOfAlternatives))
-
-    print(aggregatedPreferenceTable)
-    print(flow)
-
-    for (i in seq(numberOfAlternatives)) {
-        for (k in seq(numberOfAlternatives)) {
-            positiveI <- positiveFlow[i]
-            positiveK <- positiveFlow[k]
-            negativeI <- negativeFlow[i]
-            negativeK <- negativeFlow[k]
-
-            if (positiveI > positiveK) {
-                if (negativeI <= negativeK) {
-                    ranking[i, k] = 'P'
-                } else {
-                    ranking[i, k] = 'R'
-                }
-            } else if (negativeI < negativeK) {
-                if (positiveI >= positiveK) {
-                    ranking[i, k] = 'P'
-                } else {
-                    ranking[i, k] = 'R'
-                }
-            } else if (positiveI == positiveK && negativeI == negativeK) {
-                ranking[i, k] = 'I'
-            }
-        }
-    }
-
-    ranking
+    createRanking(positiveFlow, negativeFlow, full=FALSE)
 }
 
 PrometheeII <- function(
@@ -138,24 +157,12 @@ PrometheeII <- function(
     numberOfAlternatives <- dim(performanceTable)[1]
     preferenceCube <- calculatePreference(performanceTable, criteriaPreferenceFunction)
     aggregatedPreferenceTable <- calculateAggregatedPreference(preferenceCube, criteriaWeights)
-    positiveFlow <- mapPositiveOutrankingFlow(aggregatedPreferenceTable)
-    negativeFlow <- mapNegativeOutrankingFlow(aggregatedPreferenceTable)
+    positiveFlow <- calculatePositiveOutrankingFlow(aggregatedPreferenceTable)
+    negativeFlow <- calculateNegativeOutrankingFlow(aggregatedPreferenceTable)
 
-    flow <- positiveFlow + negativeFlow
+    flow <- positiveFlow - negativeFlow
 
-    ranking <- array('_', dim=c(numberOfAlternatives, numberOfAlternatives))
-
-    for (i in seq(numberOfAlternatives)) {
-        for (k in seq(numberOfAlternatives)) {
-            if (flow[i] > flow[k]) {
-                ranking[i, k] = 'P'
-            } else if (flow[i] == flow[k]) {
-                ranking[i, k] = 'I'
-            }
-        }
-    }
-
-    ranking
+    createRanking(flow)
 }
 
 get_criteria_difference <- function (a_criterion_value, b_criterion_value, criterion_gain) {

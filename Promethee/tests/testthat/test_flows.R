@@ -1,17 +1,38 @@
 context('flows')
 
-test_that('criteria positive flows are calculated correctly', {
+test_that('positive outranking flows are calculated correctly', {
+    aggregatedPrefference = matrix(c(
+          0, 1,  .6, .1,
+         .9, 0,  .8, .3,
+          1, 1,   0,  1, 
+        .15, 1, .25,  0
+    ), nrow=4, byrow=TRUE)
+    expectedOutrankingFlows = c(
+        0.56666,
+        0.66666,
+        1,
+        0.46666
+    )
 
+    result <- calculatePositiveOutrankingFlow(aggregatedPrefference)
+    expect_true(all(abs(expectedOutrankingFlows - result) < 0.001))
 })
 
-test_that('criteria negative flows are calculated correctly', {
+test_that('negative outranking flows are calculated correctly', {
+    aggregatedPrefference = matrix(c(
+          0, 1,  .6, .1,
+         .9, 0,  .8, .3,
+          1, 1,   0,  1, 
+        .15, 1, .25,  0
+    ), nrow=4, byrow=TRUE)
+    expectedOutrankingFlows = c(
+        0.68333,
+        1,
+        0.55,
+        0.46666
+    )
 
-})
 
-test_that('net positive flows are calculated correctly', {
-
-})
-
-test_that('net negative flows are calculated correctly', {
-
+    result <- calculateNegativeOutrankingFlow(aggregatedPrefference)
+    expect_true(all(abs(expectedOutrankingFlows - result) < 0.001))
 })

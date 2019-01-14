@@ -1,4 +1,4 @@
-context('aggregated_preference')
+context('aggregated preference')
 
 test_that('aggregate preference is an average from preference array on criteria dimension', {
     preference_array = array(c(

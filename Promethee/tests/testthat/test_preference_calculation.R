@@ -1,4 +1,4 @@
-context("Preference")
+context("preference")
 
 
 test_that("check calculating preference with basic funcion", {
@@ -19,6 +19,7 @@ test_that("check calculating preference with basic funcion", {
 
   result = calculatePreference(peformanceTable, criteriaFn)
   expect_equal(dim(result), c(5, 5, 3))
+  expect_equal(result[2,2,], c(0, 0, 0))
 })
 
 test_that("basic function is calculates preference correctly", {
