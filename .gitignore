@@ -3,3 +3,5 @@
 .RData
 .Ruserdata
 ..Rcheck
+.ipynb_checkpoints
+*.ipynb
