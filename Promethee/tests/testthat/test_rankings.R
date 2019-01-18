@@ -29,10 +29,10 @@ test_that('createRanking returns a full ranking at default', {
         0.4
     )
     expectedRanking = matrix(c(
-        'I', '-', '-', 'P', 
-        'P', 'I', '-', 'P', 
-        'P', 'P', 'I', 'P', 
-        '-', '-', '-', 'I'
+        1, 0, 0, 1, 
+        1, 1, 0, 1, 
+        1, 1, 1, 1, 
+        0, 0, 0, 1
     ), nrow=4, byrow=TRUE)
 
     expect_equal(
@@ -56,10 +56,10 @@ test_that('createRanking can create partial ranking', {
     )
 
     expectedRanking = matrix(c(
-        'I', 'R', '-', 'P', 
-        'R', 'I', '-', 'P', 
-        'P', 'P', 'I', 'P', 
-        '-', '-', '-', 'I'
+        1, 0, 0, 1, 
+        0, 1, 0, 1, 
+        1, 1, 1, 1, 
+        0, 0, 0, 1
     ), nrow=4, byrow=TRUE)
 
     expect_equal(

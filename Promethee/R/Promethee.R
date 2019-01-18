@@ -106,22 +106,28 @@ getFullRankingRelation <- function (netFlow, comparedNetFlow) {
 
 createRanking <- function(flow, negativeFlow=c(), full=TRUE) {
     n = length(flow)
-    ranking <- array('-', dim=c(n, n))
+    ranking <- array(0, dim=c(n, n))
 
     for (i in seq(n)) {
         for (k in seq(n)) {
             if (full) {
-                ranking[i, k] = getFullRankingRelation(
+                relation = getFullRankingRelation(
                     flow[i],
                     flow[k]
                 )
             } else {
-                ranking[i, k] = getPartialRankingRelation(
+                relation = getPartialRankingRelation(
                     flow[i],
                     negativeFlow[i],
                     flow[k],
                     negativeFlow[k]
                 )
+            }
+            if (relation == 'P') {
+                ranking[i, k] = 1
+            } else if (relation == 'I') {
+                ranking[i, k] = 1
+                ranking[k, i] = 1
             }
         }
     }
