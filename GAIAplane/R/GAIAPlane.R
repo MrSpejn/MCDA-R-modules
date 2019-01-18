@@ -85,15 +85,14 @@ GAIAPlain <- function(flows, criteria_weights) {
     criteria_points <- (diag(number_of_criteria) %*% transform_matrix)
     criteria_points <- as.data.frame(criteria_points, row.names=colnames(flows))
 
-    if (missing(criteria_weights) || len(criteria_weights) != number_of_criteria) {
-        weights <- rep(1, number_of_criteria)
+   if (missing(criteria_weights) || length(criteria_weights) != number_of_criteria) {
+        weights <- rep(1, number_of_criteria) / number_of_criteria 
     } else {
-        weights <- criteria_weights
+        weights <- criteria_weights / sum(criteria_weights)
     }
 
     weights <- matrix(weights, ncol=number_of_criteria, nrow=1)
     decision_stick <- as.matrix((weights %*% transform_matrix))
-    decision_stick[1,] = decision_stick[1,] / abs(sum(decision_stick[1,]))
     decision_stick <- as.data.frame(decision_stick, col.names=c("PC1", "PC2"))
 
     x_upper_bound <- max(points$PC1, decision_stick$PC1, criteria_points$PC1)*1.05
@@ -101,7 +100,6 @@ GAIAPlain <- function(flows, criteria_weights) {
     x_lower_bound <- min(points$PC1, decision_stick$PC1, criteria_points$PC1)*1.05
     y_lower_bound <- min(points$PC2, decision_stick$PC2, criteria_points$PC2)*1.05
 
-    print(decision_stick)
     addDecisionStick(
         addCriteria(
             createPlotWithAlternatives(
@@ -112,7 +110,4 @@ GAIAPlain <- function(flows, criteria_weights) {
         ),
         decision_stick
     )
-    # plot = plot
-    # plot =plot, decision_stick)
-      
 }
