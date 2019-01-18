@@ -13,12 +13,15 @@ ElectreI <- function(performanceMatrix, criteriaWeights, directions, indifferenc
         directions,
         vetoThresholds
     )
-        
-    preferenceRelation <- concorndanceCoefficients > lambda
-
-    preferenceGraph <- preferenceRelation & !vetoMatrix
+    
+    preferenceGraph <- concorndanceCoefficients > lambda & !vetoMatrix
 
     acyclicPreferenceGraph <- remove_cycles(preferenceGraph)
 
     kernel <- find_kernel(acyclicPreferenceGraph)
+    
+    return(list(
+        kernel=kernel,
+        graph=acyclicPreferenceGraph,
+    ))
 }
